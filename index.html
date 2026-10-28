@@ -1,11 +1,723 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kitty Diner🙀貓咪每日熱量計算</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Pacifico&family=Noto+Sans+TC:wght@500;700;900&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FBF3E4;
+      --card: #FFFFFF;
+      --ink: #13294B;
+      --ink-soft: #4F6283;
+      --red: #D62839;
+      --red-dark: #A11B2A;
+      --navy: #13294B;
+      --mustard: #F6B63E;
+      --teal: #3FB8AF;
+      --line: #E4D6BC;
+      --field: #FFFBF3;
+      --on-dark: #FFFFFF;
+      color-scheme: light;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0E1A30;
+        --card: #182A4A;
+        --ink: #F5EEDF;
+        --ink-soft: #B6C2D9;
+        --line: #2D4470;
+        --field: #12223D;
+        color-scheme: dark;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0E1A30;
+      --card: #182A4A;
+      --ink: #F5EEDF;
+      --ink-soft: #B6C2D9;
+      --line: #2D4470;
+      --field: #12223D;
+      color-scheme: dark;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      line-height: 1.6;
+    }
+
+    .checker {
+      height: 28px;
+      background:
+        conic-gradient(var(--red) 25%, #fff 0 50%, var(--red) 0 75%, #fff 0) 0 0 / 28px 28px;
+      border-bottom: 4px solid var(--navy);
+    }
+
+    .checker.bottom {
+      border-bottom: 0;
+      border-top: 4px solid var(--navy);
+      margin-top: 48px;
+    }
+
+    header {
+      text-align: center;
+      padding: 34px 20px 10px;
+    }
+
+    .sign {
+      display: inline-block;
+      background: var(--navy);
+      color: var(--on-dark);
+      border: 5px solid var(--mustard);
+      border-radius: 22px;
+      padding: 14px 34px 18px;
+      box-shadow: 0 0 0 5px var(--navy), 8px 10px 0 5px var(--red);
+      position: relative;
+    }
+
+    .sign .script {
+      font-family: "Pacifico", cursive;
+      font-size: clamp(2.2rem, 7vw, 3.4rem);
+      line-height: 1.1;
+      color: #FFE7A8;
+      text-shadow: 3px 3px 0 var(--red);
+    }
+
+    .sign .sub {
+      font-weight: 900;
+      letter-spacing: .3em;
+      font-size: .95rem;
+      margin-top: 4px;
+    }
+
+    .stars {
+      color: var(--mustard);
+      font-size: 1.1rem;
+      letter-spacing: .4em;
+    }
+
+    .lead {
+      color: var(--ink-soft);
+      font-weight: 700;
+      margin: 26px auto 0;
+      max-width: 36em;
+    }
+
+    .wrap {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-top: 30px;
+      align-items: start;
+    }
+
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .container-input,
+    .container-output {
+      background: var(--card);
+      border: 4px solid var(--navy);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 8px 8px 0 var(--navy);
+    }
+
+    :root[data-theme="dark"] .container-input,
+    :root[data-theme="dark"] .container-output {
+      box-shadow: 8px 8px 0 #000;
+    }
+
+    @media (prefers-color-scheme: dark) {
+
+      :root:not([data-theme="light"]) .container-input,
+      :root:not([data-theme="light"]) .container-output {
+        box-shadow: 8px 8px 0 #000;
+      }
+    }
+
+    .panel-head {
+      background: var(--red);
+      color: #fff;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 4px solid var(--navy);
+    }
+
+    .container-output .panel-head {
+      background: var(--navy);
+      border-bottom-color: var(--mustard);
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-family: "Bowlby One", "Noto Sans TC", sans-serif;
+      font-weight: 400;
+      font-size: 1.25rem;
+      letter-spacing: .03em;
+    }
+
+    .panel-head h2 small {
+      font-family: "Noto Sans TC", sans-serif;
+      font-weight: 900;
+      font-size: 1rem;
+      margin-left: 6px;
+    }
+
+    .panel-body {
+      padding: 22px 20px 24px;
+    }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .num-field label {
+      display: block;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .num-wrap {
+      position: relative;
+    }
+
+    .num-wrap input {
+      width: 100%;
+      padding: 11px 50px 11px 14px;
+      border: 3px solid var(--navy);
+      border-radius: 10px;
+      background: var(--field);
+      color: var(--ink);
+      font: 700 1.15rem "Noto Sans TC", sans-serif;
+    }
+
+    :root[data-theme="dark"] .num-wrap input {
+      border-color: var(--line);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .num-wrap input {
+        border-color: var(--line);
+      }
+    }
+
+    .num-wrap input:focus {
+      outline: none;
+      border-color: var(--red);
+      box-shadow: 0 0 0 4px rgba(214, 40, 57, .22);
+    }
+
+    .num-wrap .unit {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-weight: 900;
+      color: var(--ink-soft);
+    }
+
+    fieldset {
+      border: 0;
+      padding: 0;
+      margin: 18px 0 0;
+    }
+
+    legend {
+      font-weight: 900;
+      margin-bottom: 6px;
+      padding: 0;
+    }
+
+    .pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pills label {
+      flex: 1 1 0;
+      min-width: 72px;
+    }
+
+    .pills input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .pills span {
+      display: block;
+      text-align: center;
+      padding: 9px 8px;
+      border: 3px solid var(--navy);
+      border-radius: 999px;
+      font-weight: 900;
+      cursor: pointer;
+      background: var(--field);
+      color: var(--ink);
+      transition: background .15s, color .15s, transform .1s;
+    }
+
+    :root[data-theme="dark"] .pills span {
+      border-color: var(--line);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .pills span {
+        border-color: var(--line);
+      }
+    }
+
+    .pills span:hover {
+      transform: translateY(-2px);
+    }
+
+    .pills input:checked+span {
+      background: var(--red);
+      color: #fff;
+      border-color: var(--navy);
+      box-shadow: 3px 3px 0 var(--navy);
+    }
+
+    .pills input:focus-visible+span {
+      outline: 3px dashed var(--mustard);
+      outline-offset: 3px;
+    }
+
+    .btn {
+      margin-top: 24px;
+      width: 100%;
+      padding: 14px;
+      cursor: pointer;
+      background: var(--mustard);
+      color: var(--navy);
+      border: 4px solid var(--navy);
+      border-radius: 12px;
+      font: 400 1.25rem "Bowlby One", "Noto Sans TC", sans-serif;
+      letter-spacing: .03em;
+      box-shadow: 0 6px 0 var(--navy);
+      transition: transform .1s, box-shadow .1s;
+    }
+
+    .btn small {
+      font: 900 1rem "Noto Sans TC", sans-serif;
+    }
+
+    .btn:hover {
+      background: #FFC75A;
+    }
+
+    .btn:active {
+      transform: translateY(5px);
+      box-shadow: 0 1px 0 var(--navy);
+    }
+
+    .btn:focus-visible {
+      outline: 3px dashed var(--red);
+      outline-offset: 4px;
+    }
+
+    .error {
+      color: var(--red);
+      font-weight: 900;
+      min-height: 1.5em;
+      margin: 10px 0 0;
+      text-align: center;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 30px 10px;
+      color: var(--ink-soft);
+      font-weight: 700;
+    }
+
+    .empty .cat {
+      font-size: 64px;
+      display: block;
+    }
+
+    /* Big result: diner neon sign */
+    .result {
+      text-align: center;
+      background: var(--navy);
+      color: #fff;
+      border-radius: 16px;
+      padding: 22px 14px 20px;
+      border: 4px solid var(--mustard);
+      position: relative;
+      box-shadow: inset 0 0 0 4px var(--navy), inset 0 0 0 7px var(--red);
+    }
+
+    .result .label {
+      font-weight: 900;
+      letter-spacing: .15em;
+      font-size: .95rem;
+      color: #FFE7A8;
+    }
+
+    .result .kcal {
+      font-family: "Bowlby One", sans-serif;
+      font-size: clamp(3.4rem, 13vw, 5.2rem);
+      line-height: 1.05;
+      margin: 6px 0 2px;
+      color: #fff;
+      text-shadow: 0 0 6px rgba(255, 90, 110, .9), 0 0 22px rgba(214, 40, 57, .85), 4px 4px 0 var(--red);
+    }
+
+    .result .kcal small {
+      font-size: .32em;
+      letter-spacing: .05em;
+      text-shadow: none;
+      color: var(--mustard);
+      margin-left: 6px;
+    }
+
+    .result .range {
+      font-weight: 700;
+      color: #D5DDEE;
+      font-size: .92rem;
+    }
+
+    .result .tagline {
+      font-family: "Pacifico", cursive;
+      color: var(--mustard);
+      font-size: 1.15rem;
+      margin-top: 6px;
+    }
+
+    .flash {
+      animation: flicker 1.1s steps(1) 1;
+    }
+
+    @keyframes flicker {
+
+      0%,
+      20%,
+      40% {
+        opacity: 1
+      }
+
+      10%,
+      30% {
+        opacity: .25
+      }
+    }
+
+    .steps {
+      margin-top: 20px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .step {
+      border: 3px solid var(--navy);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--field);
+    }
+
+    :root[data-theme="dark"] .step {
+      border-color: var(--line);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .step {
+        border-color: var(--line);
+      }
+    }
+
+    .step h3 {
+      margin: 0;
+      font-size: .95rem;
+      padding: 6px 12px;
+      background: var(--teal);
+      color: var(--navy);
+      font-weight: 900;
+    }
+
+    .step .body {
+      padding: 10px 12px;
+    }
+
+    .eq {
+      font-weight: 700;
+      font-size: 1.02rem;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .eq b {
+      color: var(--red);
+    }
+
+    :root[data-theme="dark"] .eq b {
+      color: #FF7A88;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .eq b {
+        color: #FF7A88;
+      }
+    }
+
+    .why {
+      color: var(--ink-soft);
+      font-size: .88rem;
+      margin: 4px 0 0;
+    }
+
+    .ticket {
+      display: inline-block;
+      background: var(--mustard);
+      color: var(--navy);
+      font-weight: 900;
+      padding: 1px 10px;
+      border-radius: 6px;
+      font-size: .88rem;
+    }
+
+    .disclaimer {
+      color: var(--ink-soft);
+      font-size: .82rem;
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--ink-soft);
+      font-weight: 700;
+      font-size: .85rem;
+      padding: 14px 20px 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    hello github
+  <div class="checker" aria-hidden="true"></div>
+
+  <header>
+    <div class="sign">
+      <div class="stars" aria-hidden="true">★ ★ ★</div>
+      <div class="script">Kitty Diner</div>
+      <div class="sub">貓咪每日熱量計算</div>
+    </div>
+    <p class="lead">填好你家主子的資料，我們來算算牠一天該吃多少大卡 🐾</p>
+  </header>
+
+  <div class="wrap">
+    <main class="grid">
+      <section class="container-input" aria-labelledby="in-title">
+        <div class="panel-head"><span aria-hidden="true">📝</span>
+          <h2 id="in-title">ORDER<small>貓咪資料</small></h2>
+        </div>
+        <div class="panel-body">
+          <form id="form" novalidate>
+            <div class="row2">
+              <div class="num-field">
+                <label for="age">年紀</label>
+                <div class="num-wrap"><input type="number" id="age" min="0" max="30" step="0.1" inputmode="decimal"
+                    placeholder="例如 3"><span class="unit">歲</span></div>
+              </div>
+              <div class="num-field">
+                <label for="weight">體重</label>
+                <div class="num-wrap"><input type="number" id="weight" min="0.1" max="20" step="0.1" inputmode="decimal"
+                    placeholder="例如 4.5"><span class="unit">kg</span></div>
+              </div>
+            </div>
+
+            <fieldset>
+              <legend>是否結紮</legend>
+              <div class="pills">
+                <label><input type="radio" name="neutered" value="yes" checked><span>✂️ 已結紮</span></label>
+                <label><input type="radio" name="neutered" value="no"><span>未結紮</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>是公是母</legend>
+              <div class="pills">
+                <label><input type="radio" name="sex" value="male" checked><span>♂ 公貓</span></label>
+                <label><input type="radio" name="sex" value="female"><span>♀ 母貓</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>貓咪身材</legend>
+              <div class="pills">
+                <label><input type="radio" name="body" value="thin"><span>過瘦</span></label>
+                <label><input type="radio" name="body" value="normal" checked><span>標準</span></label>
+                <label><input type="radio" name="body" value="fat"><span>過胖</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>運動量</legend>
+              <div class="pills">
+                <label><input type="radio" name="activity" value="low"><span>低</span></label>
+                <label><input type="radio" name="activity" value="mid" checked><span>中</span></label>
+                <label><input type="radio" name="activity" value="high"><span>高</span></label>
+              </div>
+            </fieldset>
+
+            <button type="submit" class="btn">CALCULATE <small>計算熱量</small></button>
+            <p class="error" id="error" role="alert"></p>
+          </form>
+        </div>
+      </section>
+
+      <section class="container-output" aria-labelledby="out-title" aria-live="polite">
+        <div class="panel-head"><span aria-hidden="true">🍽️</span>
+          <h2 id="out-title">TODAY'S MENU<small>計算結果</small></h2>
+        </div>
+        <div class="panel-body" id="output">
+          <div class="empty">
+            <span class="cat" aria-hidden="true">🐈</span>
+            填好左邊的單子，按下「CALCULATE」<br>主子的每日熱量就會出現在這裡！
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>★ RER = 體重(kg)<sup>0.75</sup> × 70 ・ DER = RER × 需求因子 ★</footer>
+  </div>
+
+  <div class="checker bottom" aria-hidden="true"></div>
+
+  <script>
+    const form = document.getElementById('form');
+    const out = document.getElementById('output');
+    const err = document.getElementById('error');
+    const r1 = n => Math.round(n * 10) / 10;
+
+    // Pick the life-stage / condition range, then position within it by activity level.
+    function getFactor({ age, neutered, body }) {
+      if (age < 1) return { min: 2.0, max: 2.5, label: '發育期幼貓', why: '未滿 1 歲，正在長大，需要較多能量' };
+      if (body === 'fat') return { min: 0.8, max: 1.0, label: '過胖貓（減肥中）', why: '以理想體重計算，幫助穩定減重', ideal: true };
+      if (body === 'thin') return { min: 1.2, max: 1.8, label: '過瘦貓', why: '需要補充能量、慢慢增重' };
+      if (age >= 11) return { min: 1.1, max: 1.6, label: '高齡貓（11 歲以上）', why: '熟齡貓代謝改變，依活動量調整' };
+      if (neutered) return { min: 1.2, max: 1.4, label: '已結紮成貓', why: '結紮後代謝較低，容易發胖' };
+      return { min: 1.4, max: 1.6, label: '未結紮成貓', why: '未結紮成貓代謝較旺盛' };
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const age = parseFloat(document.getElementById('age').value);
+      const weight = parseFloat(document.getElementById('weight').value);
+      if (isNaN(age) || age < 0 || age > 30) { err.textContent = '請輸入 0–30 之間的年紀'; return; }
+      if (isNaN(weight) || weight <= 0 || weight > 20) { err.textContent = '請輸入 0.1–20 kg 之間的體重'; return; }
+      err.textContent = '';
+
+      const get = n => form.querySelector(`input[name="${n}"]:checked`).value;
+      const neutered = get('neutered') === 'yes';
+      const sex = get('sex');
+      const body = get('body');
+      const activity = get('activity');
+
+      const f = getFactor({ age, neutered, body });
+      const pos = { low: 0, mid: 0.5, high: 1 }[activity];
+      const factor = Math.round((f.min + (f.max - f.min) * pos) * 100) / 100;
+
+      const calcWeight = f.ideal ? r1(weight / 1.2) : weight;
+      const rer = Math.pow(calcWeight, 0.75) * 70;
+      const der = rer * factor;
+      const lo = Math.round(rer * f.min), hi = Math.round(rer * f.max);
+
+      const name = sex === 'male' ? '公貓' : '母貓';
+      const actText = { low: '低', mid: '中', high: '高' }[activity];
+      const actHint = { low: '運動量低，取區間下限', mid: '運動量中等，取區間中間值', high: '運動量高，取區間上限' }[activity];
+
+      out.innerHTML = `
+      <div class="result flash">
+        <div class="label">★ 每日所需熱量 ★</div>
+        <div class="kcal">${Math.round(der).toLocaleString('zh-TW')}<small>kcal / 天</small></div>
+        <div class="range">建議範圍 ${lo}–${hi} kcal</div>
+        <div class="tagline">Bon appétit, kitty!</div>
+      </div>
+
+      <div class="steps">
+        ${f.ideal ? `
+        <div class="step">
+          <h3>STEP 0・估算理想體重</h3>
+          <div class="body">
+            <div class="eq">${weight} kg ÷ 1.2 ≈ <b>${calcWeight} kg</b></div>
+            <p class="why">過胖貓以理想體重計算；此處假設目前約超重 20%，若獸醫有給理想體重，請以獸醫為準。</p>
+          </div>
+        </div>` : ''}
+        <div class="step">
+          <h3>STEP 1・靜止能量需求量 RER</h3>
+          <div class="body">
+            <div class="eq">RER = ${calcWeight}<sup>0.75</sup> × 70 = <b>${r1(rer)} kcal</b></div>
+          </div>
+        </div>
+        <div class="step">
+          <h3>STEP 2・需求因子</h3>
+          <div class="body">
+            <span class="ticket">${f.label}</span>
+            <div class="eq" style="margin-top:6px">區間 ${f.min} – ${f.max} → 取 <b>${factor}</b></div>
+            <p class="why">${f.why}；${actHint}（運動量：${actText}）。</p>
+          </div>
+        </div>
+        <div class="step">
+          <h3>STEP 3・每日能量需求 DER</h3>
+          <div class="body">
+            <div class="eq">DER = ${r1(rer)} × ${factor} = <b>${r1(der)} kcal</b></div>
+            <p class="why">${age} 歲・${weight} kg・${neutered ? '已結紮' : '未結紮'}${name}・身材${{ thin: '過瘦', normal: '標準', fat: '過胖' }[body]}</p>
+          </div>
+        </div>
+      </div>
+      <p class="disclaimer">計算結果僅供參考，實際餵食量請依貓咪體態變化並諮詢獸醫師。</p>`;
+    });
+  </script>
 </body>
+
 </html>
